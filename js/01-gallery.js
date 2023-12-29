@@ -1,9 +1,13 @@
-import { galleryItems, galleryItems as items } from './gallery-items.js';
+import { galleryItems } from './gallery-items.js';
 // Change code below this line
+
 
 const galleryList = document.querySelector(".gallery");
 const cardsMarkup = createImageGalleryMarkup(galleryItems);
 galleryList.innerHTML = cardsMarkup;
+
+let activeInstance = null;
+galleryList.addEventListener("click", onGalleryItemsClick);
 
 function createImageGalleryMarkup(items) {
     return items
@@ -22,21 +26,27 @@ function createImageGalleryMarkup(items) {
 `
   ).join('');
 }
-
-let activeInstance = null;
-
-galleryList.addEventListener("click", onGalleryItemsClick);
-
 function onGalleryItemsClick(event) {
     event.preventDefault();
+
     const clickedImage = event.target.closest(".gallery__image");
     if (!clickedImage) {
         return;
     }
-    const largeImageURL = clickedImage.dataset.source;
+    const largeImageURL = clickedImage.dataset.source;    
 
-    const instance = basicLightbox.create(`
-    <img src="${largeImageURL}" alt="Image" />`)
+    const instance = basicLightbox.create(
+      `
+      <div class='modal'>
+      <img src="${largeImageURL}" alt="Image" />
+      </div>`
+    );
+    instance.element().addEventListener("click", (event) => {
+      if (event.target.tagName === "IMG") {
+        return;
+      }
+        instance.close();
+    });
 
     if (activeInstance) {
         activeInstance.close();
